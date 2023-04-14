@@ -1,0 +1,6 @@
+{
+	"require":{
+		"smarty/smarty": "*",
+		"abraham/twitteroauth": "*"
+	}
+}
