@@ -15,26 +15,50 @@ require_once 'MySmarty.class.php';
 
 // ツイッター認証ライブラリ用の名前空間をインポートします。
 use Abraham\TwitterOAuth\TwitterOAuth;
-
 // ツイッター認証用のインスタンスを作成します。
 $connection = new TwitterOAuth($consumer_key, $consumer_key_sercret, $access_token, $access_token_secret);
+//API V2を使用します。
+$connection->setApiVersion('2');
 
 // ツイッターアカウント一覧のファイルを開きます。
 ($file = @fopen(FILE_PATH, 'rb')) or dir('ファイルを開けませんでした');
+$data = ''; // データを格納する変数
 // アカウントファイルを一行ごとに読み込みます。
 while ($fline = fgets($file, 1024)) {
-  // ツイッター情報を取得し配列に格納します。
-  $contents[] = $connection->get('statuses/user_timeline', ['screen_name' => $fline]);
+  // 一行のデータを取得し、カンマで区切って$dataに追加します。
+  $data .= trim($fline) . ',';
+}
+$data = rtrim($data, ','); // 最後の余分なカンマを削除します。
+
+// ユーザID取得用のパラーメータを作成します。
+$params = [
+  'usernames' => $data,
+  'tweet.fields' => 'author_id,created_at', // 今回は追加で投稿日時を指定
+  'expansions' => 'pinned_tweet_id',
+  'user.fields' => 'id,name,username,url,description,profile_image_url',
+];
+// ユーザーIDを含むユーザー情報を取得します。
+$user_data[] = $connection->get('users/by', $params);
+// ユーザーのタイムライン(ツイート)を取得するためのパラメーターです。
+$params_ids = [
+  'tweet.fields' => 'created_at',
+  'expansions' => 'author_id',
+  'max_results' => 10,
+  'user.fields' => 'id,name,username,url,description,profile_image_url',
+];
+// ユーザーIDでツイート情報(タイムライン)を取得します。
+foreach ($user_data[0]->data as $item) {
+  $user_id = trim($item->id);
+  $contents[] = $connection->get('users/' . $user_id . '/tweets', $params_ids);
 }
 
-// ソート用の前処理。
-// ツイート情報の配列からアカウント毎にツイート情報を取り出します。
+// ソートの前処理。
+// ツイート情報の配列からソート用にツイート日時、ユーザIDを取り出します
 foreach ($contents as $value) {
   // 一番新しいツイート日時を取得し日付ソート用にDateTimeクラスで処理します。
-  $time[] = new DateTime($value[0]->created_at);
+  $time[] = new DateTime($value->data[0]->created_at);
   // アカウントIDを取得します。
-  // $id[] = $value[0]->id . "\n";
-  $id[] = $value[0]->id;
+  $id[] = $value->includes->users[0]->id;
 }
 
 // ツイート情報配列についてツイート日時とアカウント(ツイート日時が同じだった場合)をキーにソートします。
@@ -46,5 +70,3 @@ $s = new MySmarty();
 $s->assign('contents', $contents);
 // テンプレートファイルを画面に出力します。
 $s->d();
-
-// print_r($contents);

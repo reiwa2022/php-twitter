@@ -37,23 +37,23 @@
         <div class="twitter-container-one">
           <div class="twitterーcontainer-top">
             <div class="twitter-icon">
-              <a href="https://twitter.com/{$content->statuses[0]->user->screen_name}" target="_blank">
-                <img src="{$content->statuses[0]->user->profile_image_url_https}" alt="ツイッターアイコン">
+              <a href="https://twitter.com/{$content->includes->users[0]->username}" target="_blank">
+                <img src="{$content->includes->users[0]->profile_image_url}" alt="ツイッターアイコン">
               </a>
             </div>
             <div class="twitter-top-right">
               <div class="twitter-name">
-                <a href="https://twitter.com/{$content->statuses[0]->user->screen_name}" target="_blank">
-                  {$content->statuses[0]->user->name}
+                <a href="https://twitter.com/{$content->includes->users[0]->username}" target="_blank">
+                  {$content->includes->users[0]->name}
                 </a>
               </div>
             </div>
             <div class="tweeter-description-area">
-              {$content->statuses[0]->user->description}
+              {$content->includes->users[0]->description}
             </div>
           </div>
           <div class="tweet-container-bottom">
-            {foreach from=$content->statuses item=elem}
+            {foreach from=$content->data item=elem}
               <p class="tweets-content">{$elem->text}</p>
               <p class="tweet-time">{$elem->created_at|date_format:"Y年m月d日 H:i:s"}</p>
               <hr class="tweet-hr">
@@ -62,9 +62,8 @@
         </div>
       {/foreach}
     </div>
-    {* <div class="back-area"> *}
+
     <p class="back-p"><a href="JavaScript:history.back()" class="link-underline">戻る</a></p>
-    {* </div> *}
     <hr class="copylight-hr">
     <div id="footter-area">
       <div class="admin-link">
