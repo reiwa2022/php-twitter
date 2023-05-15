@@ -120,6 +120,7 @@ body {
   justify-content: center;
   background-color: #3bb58c;
   width: 66%;
+  min-width: min-content;
   height: auto;
   margin: 20px auto;
   padding: 2px;
