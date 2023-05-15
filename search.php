@@ -26,11 +26,11 @@ $connection = new TwitterOAuth($consumer_key, $consumer_key_sercret, $access_tok
 $connection->setApiVersion('2');
 // ツイッターアカウント一覧のファイルを開きます。
 ($file = @fopen(FILE_PATH, 'rb')) or dir('ファイルを開けませんでした');
-
-$data = ''; // データを格納する変数
-// アカウントファイルを一行ごとに読み込みます。
+// 文字列連結用に変数を初期化します。
+$data = '';
+// アカウントファイルを一行ごとに読み込み、カンマ区切りで$dataに追加します。
 while ($fline = fgets($file, 1024)) {
-  // 一行のデータを取得し、カンマで区切って$dataに追加します。
+  // アカウント一覧をカンマ区切りで連結します。
   $data .= trim($fline) . ',';
 }
 $data = rtrim($data, ','); // 最後の余分なカンマを削除します。
@@ -38,14 +38,14 @@ $data = rtrim($data, ','); // 最後の余分なカンマを削除します。
 // ユーザID取得用のパラーメータを作成します。
 $params = [
   'usernames' => $data,
-  'tweet.fields' => 'author_id,created_at', // 今回は追加で投稿日時を指定
+  'tweet.fields' => 'author_id,created_at',
   'expansions' => 'pinned_tweet_id',
   'user.fields' => 'id,name,username,url,description,profile_image_url',
 ];
-// ユーザーIDを含むユーザー情報を取得します。
+// TwitterAPIからユーザーIDを含むユーザー情報を取得します。
 $user_data[] = $connection->get('users/by', $params);
 
-// ツイート検索用のパラメーターを作成し、検索ワードでヒットしたツイート情報を取得します。
+// ツイート検索用のパラメーターを作成し、検索ワードに一致したツイート情報を取得します。
 foreach ($user_data[0]->data as $item) {
   $user_id = trim($item->id);
   $params_ids = [
@@ -91,7 +91,7 @@ foreach ($filterResults as $value) {
   $id[] = $value->includes->users[0]->id;
 }
 
-// ツイート情報配列についてツイート日時とアカウント(ツイート日時が同じだった場合)をキーにソートします。
+// ツイート情報配列についてツイート日時とユーザID(ツイート日時が同じだった場合)をキーにソートします。
 array_multisort($time, SORT_DESC, SORT_REGULAR, $id, SORT_DESC, SORT_NUMERIC, $filterResults);
 
 // テンプレートエンジン用の処理

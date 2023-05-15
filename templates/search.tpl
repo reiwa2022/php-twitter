@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <meta charset="utf=8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Twitter情報表示サイト(勉強用)</title>
   <link rel="stylesheet" href="css/destyle.css">
