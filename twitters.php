@@ -19,7 +19,6 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 $connection = new TwitterOAuth($consumer_key, $consumer_key_sercret, $access_token, $access_token_secret);
 //API V2を使用します。
 $connection->setApiVersion('2');
-
 // ツイッターアカウント一覧のファイルを開きます。
 ($file = @fopen(FILE_PATH, 'rb')) or dir('ファイルを開けませんでした');
 // 文字列連結用に変数を初期化します。
@@ -34,24 +33,24 @@ $data = rtrim($data, ','); // 最後の余分なカンマを削除します。
 // ユーザID取得用のパラーメータを作成します。
 $params = [
   'usernames' => $data, //カンマ区切りのアカウント一覧
-  'tweet.fields' => 'created_at',
-  // 'expansions' => 'pinned_tweet_id',
+  'tweet.fields' => 'author_id,created_at',
+  'expansions' => 'pinned_tweet_id',
   'user.fields' => 'id,name,username,url,description,profile_image_url',
 ];
 // TwitterAPIからユーザーIDを含むユーザー情報を取得します。
 $user_data[] = $connection->get('users/by', $params);
 
-// ユーザーのタイムライン(ツイート)を取得するためのパラメーターです。
-$params_ids = [
-  'tweet.fields' => 'created_at',
-  'expansions' => 'author_id',
-  'max_results' => 10,
-  'user.fields' => 'id,name,username,url,description,profile_image_url',
-];
 // ユーザーIDでツイート情報(タイムライン)を取得します。
 foreach ($user_data[0]->data as $item) {
   $user_id = trim($item->id);
-  $contents[] = $connection->get('users/' . $user_id . '/tweets', $params_ids);
+  $params_ids = [
+    'query' => "from:{$user_id}",
+    'tweet.fields' => 'created_at',
+    'expansions' => 'author_id',
+    'max_results' => 10,
+    'user.fields' => 'id,name,username,url,description,profile_image_url',
+  ];
+  $contents[] = $connection->get('tweets/search/recent', $params_ids);
 }
 
 // ソートの前処理。

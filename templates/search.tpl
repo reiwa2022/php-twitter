@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="twitter-container-area">
-      {foreach from=$contents item=content}
+      {foreach from=$contents item=$content}
         <div class="twitter-container-one">
           <div class="twitterーcontainer-top">
             <div class="twitter-icon">
