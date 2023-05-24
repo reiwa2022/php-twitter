@@ -34,7 +34,7 @@ $data = rtrim($data, ','); // 最後の余分なカンマを削除します。
 // ユーザID取得用のパラーメータを作成します。
 $params = [
   'usernames' => $data, //カンマ区切りのアカウント一覧
-  'tweet.fields' => 'author_id,created_at',
+  'tweet.fields' => 'created_at',
   'expansions' => 'pinned_tweet_id',
   'user.fields' => 'id,name,username,url,description,profile_image_url',
 ];
